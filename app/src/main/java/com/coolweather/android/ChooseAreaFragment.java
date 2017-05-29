@@ -2,6 +2,7 @@ package com.coolweather.android;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -71,7 +72,7 @@ public class ChooseAreaFragment extends Fragment {
         titleText = (TextView) view.findViewById(R.id.title_text);
         listView = (ListView) view.findViewById(R.id.list_view);
         backButton = (Button) view.findViewById(R.id.back_button);
-        adapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1,dataList);
+        adapter = new ArrayAdapter<>(MyApplication.getContext(),android.R.layout.simple_list_item_1,dataList);
         listView.setAdapter(adapter);
         return view;
     }
@@ -81,13 +82,20 @@ public class ChooseAreaFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 if(currentLevel==LEVEL_PROVINCE){
-                    selectedProvince=provinceList.get(i);
+                    selectedProvince=provinceList.get(position);
                     queryCities();
                 }else if(currentLevel == LEVEL_CITY){
-                    selectedCity = cityList.get(i);
+                    selectedCity = cityList.get(position);
                     queryCounties();
+                }else if(currentLevel == LEVEL_COUNTY){
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(),WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
+
                 }
             }
         });
@@ -175,7 +183,7 @@ public class ChooseAreaFragment extends Fragment {
                     @Override
                     public void run() {
                         closeProgressDialog();
-                        Toast.makeText(getContext(),"Loaded fail",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MyApplication.getContext(),"Loaded fail",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
